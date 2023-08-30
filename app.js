@@ -16,6 +16,7 @@ const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
+//Start express app
 // Added for leaflet
 const scriptSrcUrls = [
   'https://unpkg.com/',
