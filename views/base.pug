@@ -1,0 +1,35 @@
+doctype html
+html
+    head
+        block head
+            script( crossorigin="anonymous" src='https://js.stripe.com/v3/')
+            meta(charset='UTF-8')
+            meta(name='viewport' content='width=device-width, initial-scale=1.0')
+            link(rel='stylesheet' href='/css/style.css')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+            title Natours | #{title}
+
+    body
+        // HEADER
+        include _header
+
+        // CONTENT
+        block content
+            h1 this is a place holder heading
+
+        //FOOTER
+        include _footer
+        script(src='/js/bundled/index.js' type='module')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js' type='module')
+        //- OLDD 
+        //- script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js')
+        //- script(defer, src='/js/leaflet.js', type='module')
+        //- script(type='module' src='/js/bundled/index.js')
+
+
+
+
+        //- script(src='/js/login.js')
+        //- script(src='/js/bundle.js')
+        //-  script(src='https://unpkg.com/leaflet@1.9.3/dist/leaflet.js' integrity='sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=' crossorigin='')
