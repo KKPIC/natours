@@ -18,11 +18,11 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
   });
 
-  const price = await stripe.prices.create({
-    product: product.id,
-    unit_amount: tour.price * 100,
-    currency: 'usd',
-  });
+  // const price = await stripe.prices.create({
+  //   product: product.id,
+  //   unit_amount: tour.price * 100,
+  //   currency: 'usd',
+  // });
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -36,7 +36,23 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     mode: 'payment',
     line_items: [
       {
-        price: price.id,
+        price_data: {
+          currency: 'usd',
+          unit_amount: tour.price * 100,
+          product_data: {
+            name: `${tour.name} Tour`,
+            description: tour.summary,
+            // images need to be live links from the deployed website
+            images:
+              process.env.NODE_ENV === 'development'
+                ? [`https://www.natours.dev/img/tours/${tour.imageCover}`]
+                : [
+                    `${req.protocol}://${req.get('host')}/img/tours/${
+                      tour.imageCover
+                    }`,
+                  ],
+          },
+        },
         quantity: 1,
       },
     ],
@@ -61,7 +77,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.line_items[0].price.unit_amount / 100;
+  const price = session.amount_total / 100;
   await Booking.create({ tour, user, price });
 };
 exports.webhookCheckout = (req, res, next) => {
