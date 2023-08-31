@@ -62,7 +62,7 @@
 // exports.deleteBooking = factory.deleteOne(Booking);
 
 ///// orig
-const Stripe = require('stripe');
+const stripe = require('stripe');
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
@@ -73,7 +73,7 @@ const { ServerSession } = require('mongodb');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1 get the currently booked tour
-  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = stripe(process.env.STRIPE_SECRET_KEY);
   const tour = await Tour.findById(req.params.tourId);
   // 2 create checkout session
   const product = await stripe.products.create({
@@ -127,7 +127,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.price.id.unit_amount / 100;
+  const price = session.price.id.unit_a / 100;
   await Booking.create({ tour, user, price });
 };
 exports.webhookCheckout = (req, res, next) => {
@@ -135,7 +135,7 @@ exports.webhookCheckout = (req, res, next) => {
 
   let event;
   try {
-    event = Stripe.webhooks.constructEvent(
+    event = stripe.webhooks.construtEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
