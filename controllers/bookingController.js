@@ -62,7 +62,7 @@
 // exports.deleteBooking = factory.deleteOne(Booking);
 
 ///// orig
-const stripe = require('stripe');
+const Stripe = require('stripe');
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
@@ -90,7 +90,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     currency: 'usd',
   });
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await Stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     // success_url: `${req.protocol}://${req.get('host')}/?tour=${
     //   req.params.tourId
@@ -131,11 +131,11 @@ const createBookingCheckout = async (session) => {
   await Booking.create({ tour, user, price });
 };
 exports.webhookCheckout = (req, res, next) => {
-  const signature = req.headers['stripe-signature'];
+  const signature = req.headers['Stripe-signature'];
 
   let event;
   try {
-    event = stripe.webhooks.construtEvent(
+    event = Stripe.webhooks.construtEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
