@@ -73,7 +73,7 @@ const { ServerSession } = require('mongodb');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1 get the currently booked tour
-  const stripe = stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
   const tour = await Tour.findById(req.params.tourId);
   // 2 create checkout session
   const product = await stripe.products.create({
@@ -90,7 +90,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     currency: 'usd',
   });
 
-  const session = await Stripe.checkout.sessions.create({
+  const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     // success_url: `${req.protocol}://${req.get('host')}/?tour=${
     //   req.params.tourId
@@ -127,15 +127,15 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.line_items.unit_amount / 100;
+  const price = session.display_items[0].price.unit_amount / 100;
   await Booking.create({ tour, user, price });
 };
 exports.webhookCheckout = (req, res, next) => {
-  const signature = req.headers['Stripe-signature'];
+  const signature = req.headers['stripe-signature'];
 
   let event;
   try {
-    event = Stripe.webhooks.construtEvent(
+    event = Stripe.webhooks.constructEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
